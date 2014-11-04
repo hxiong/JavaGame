@@ -4,7 +4,9 @@ import java.awt.*;
 import java.util.Iterator;
 
 import com.brackeen.javagamebook.graphics.Sprite;
+import com.brackeen.javagamebook.tilegame.sprites.Bullet;
 import com.brackeen.javagamebook.tilegame.sprites.Creature;
+import com.brackeen.javagamebook.tilegame.sprites.Player;
 
 /**
     The TileMapRenderer class draws a TileMap on the screen.
@@ -78,7 +80,8 @@ public class TileMapRenderer {
     public void draw(Graphics2D g, TileMap map,
         int screenWidth, int screenHeight)
     {
-        Sprite player = map.getPlayer();
+        //Sprite player = map.getPlayer();
+    	Player player =(Player) map.getPlayer();
         int mapWidth = tilesToPixels(map.getWidth());
 
         // get the scrolling position of the map
@@ -147,6 +150,28 @@ public class TileMapRenderer {
                 ((Creature)sprite).wakeUp();
             }
         }
+        
+        //// draw some bullshit strings
+        //g.drawString("Player Health:  "+((Player) player).getHealth(), 25, 25);
+         g.drawString("Player Health:  "+ player.getHealth(), 25, 25);
+        
+         
+         //// draw bullets
+         g.setColor(Color.YELLOW);
+      //   ArrayList x = map.getbullets();
+         Iterator b = (Iterator) map.getBulletList();
+         while (b.hasNext()){
+        //	 System.out.println("shhht");
+        	 Bullet bullet = (Bullet) b.next();
+        	 int position_x = Math.round(bullet.getX());
+        	 int position_y = Math.round(bullet.getY());
+//        	 System.out.println("x position" + position_x);
+//        	 System.out.println("y position" + position_y);
+        	 //g.drawOval(Math.round(player.getX())+offsetX+160, Math.round(player.getY())+offsetY+3, 5,5);
+        	 g.fillOval(position_x, position_y, 8, 8);
+         }
+       
+         
     }
 
 }

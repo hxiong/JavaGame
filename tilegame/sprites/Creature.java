@@ -25,6 +25,7 @@ public abstract class Creature extends Sprite {
     private Animation deadRight;
     private int state;
     private long stateTime;
+    
 
     /**
         Creates a new Creature with the specified Animations.
@@ -150,6 +151,7 @@ public abstract class Creature extends Sprite {
         else if (getVelocityX() > 0) {
             newAnim = right;
         }
+        
         if (state == STATE_DYING && newAnim == left) {
             newAnim = deadLeft;
         }

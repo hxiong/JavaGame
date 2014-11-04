@@ -45,6 +45,7 @@ public class GameManager extends GameCore {
     private GameAction moveRight;
     private GameAction jump;
     private GameAction exit;
+    private GameAction pshoot;   // player shoot
 
 
     public void init() {
@@ -92,10 +93,13 @@ public class GameManager extends GameCore {
     private void initInput() {
         moveLeft = new GameAction("moveLeft");
         moveRight = new GameAction("moveRight");
+        
         jump = new GameAction("jump",
             GameAction.DETECT_INITAL_PRESS_ONLY);
         exit = new GameAction("exit",
             GameAction.DETECT_INITAL_PRESS_ONLY);
+        
+        pshoot = new GameAction("pshoot");
 
         inputManager = new InputManager(
             screen.getFullScreenWindow());
@@ -105,6 +109,9 @@ public class GameManager extends GameCore {
         inputManager.mapToKey(moveRight, KeyEvent.VK_RIGHT);
         inputManager.mapToKey(jump, KeyEvent.VK_SPACE);
         inputManager.mapToKey(exit, KeyEvent.VK_ESCAPE);
+        inputManager.mapToKey(pshoot, KeyEvent.VK_S);
+        
+   ////     inputManager ....
     }
 
 
@@ -127,6 +134,11 @@ public class GameManager extends GameCore {
                 player.jump(false);
             }
             player.setVelocityX(velocityX);
+            
+            if (pshoot.isPressed()){
+            	Bullet bullet = new Bullet(player.getX(),player.getY());
+            	map.addBullet(bullet);
+            }
         }
 
     }
@@ -288,6 +300,14 @@ public class GameManager extends GameCore {
             // normal update
             sprite.update(elapsedTime);
         }
+        
+        // update bullet
+        Iterator b = (Iterator) map.getBulletList();
+        while(b.hasNext()){
+        	//// TODO you want to remove bullets under certain situatio;
+        	Bullet bullet = (Bullet) b.next();
+        	bullet.update(elapsedTime);
+        }
     }
 
 
@@ -387,8 +407,15 @@ public class GameManager extends GameCore {
                 player.jump(true);
             }
             else {
-                // player dies!
-                player.setState(Creature.STATE_DYING);
+            	//// update the player health, if below 0, then die
+//            	player.updateHealth(-5);
+//            	if (player.getHealth() <= 0){
+//                // player dies!
+//                player.setState(Creature.STATE_DYING);
+//            	}else{
+//            		player.setState(Creature.STATE_NORMAL);
+//            	}
+            	player.setState(Creature.STATE_DYING);
             }
         }
     }

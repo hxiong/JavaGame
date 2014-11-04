@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Iterator;
 
 import com.brackeen.javagamebook.graphics.Sprite;
+import com.brackeen.javagamebook.tilegame.sprites.Bullet;
 
 /**
     The TileMap class contains the data for a tile-based
@@ -17,6 +18,7 @@ public class TileMap {
     private Image[][] tiles;
     private LinkedList sprites;
     private Sprite player;
+    private LinkedList<Bullet> bullets;
 
     /**
         Creates a new TileMap with the specified width and
@@ -25,6 +27,7 @@ public class TileMap {
     public TileMap(int width, int height) {
         tiles = new Image[width][height];
         sprites = new LinkedList();
+        bullets = new LinkedList();
     }
 
 
@@ -107,6 +110,22 @@ public class TileMap {
     */
     public Iterator getSprites() {
         return sprites.iterator();
+    }
+    
+    /**  
+        add bullet object to this map
+    */
+    public void addBullet(Bullet bullet){
+    	bullets.add(bullet);
+    }
+    public void removeBullet(Bullet bullet){
+    	bullets.remove(bullet);
+    }
+//    public LinkedList<Bullet> getBulletList(){
+//    	return bullets;
+//    }
+    public Iterator getBulletList(){
+    	return bullets.iterator();
     }
 
 }

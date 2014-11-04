@@ -10,16 +10,24 @@ public class Player extends Creature {
     private static final float JUMP_SPEED = -.95f;
 
     private boolean onGround;
+    
+    //// player health status
+    private final float MOVE_SCALE;
+    private float health;
 
     public Player(Animation left, Animation right,
         Animation deadLeft, Animation deadRight)
     {
         super(left, right, deadLeft, deadRight);
+        this.health = 20;
+        this.MOVE_SCALE = 0.05f;
     }
 
 
     public void collideHorizontal() {
         setVelocityX(0);
+        this.health -= 1*MOVE_SCALE;
+        
     }
 
 
@@ -59,7 +67,16 @@ public class Player extends Creature {
 
 
     public float getMaxSpeed() {
+    	if (this.health < 40){  this.health += 1*MOVE_SCALE;}
+    	
         return 0.5f;
     }
-
+    
+    public int getHealth(){
+    	return Math.round(this.health);
+    }
+    
+    public void updateHealth(int a){
+    	this.health += a;
+    }
 }
