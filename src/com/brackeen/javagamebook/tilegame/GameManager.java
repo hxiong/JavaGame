@@ -78,7 +78,7 @@ public class GameManager extends GameCore {
 
         // load sounds
         soundManager = new SoundManager(PLAYBACK_FORMAT);
-        deadSound = soundManager.getSound("sounds/prize.wav");
+        deadSound = soundManager.getSound("sounds/cartoon007.wav");
         prizeSound = soundManager.getSound("sounds/prize.wav");
         boopSound = soundManager.getSound("sounds/boop2.wav");   
         bulletSound = soundManager.getSound("sounds/bulletWhizz.wav");
@@ -542,10 +542,9 @@ public class GameManager extends GameCore {
         Sprite collisionSprite = getSpriteCollision(player);
         if (collisionSprite instanceof PowerUp) {
             acquirePowerUp((PowerUp)collisionSprite);
-            // update player score by 5 for each mushroom eat
-            //TODO play a sound for each mushroom as well
+            // update player score by 5 for each sprite eat           
             player.updateScore(5);
-            soundManager.play(mushrmSound);
+     //       soundManager.play(mushrmSound);
             //acquire mushroom, gain health
             if(player.getHealth()<=40&&collisionSprite instanceof PowerUp.Mushroom)
             {
@@ -601,6 +600,10 @@ public class GameManager extends GameCore {
         if (powerUp instanceof PowerUp.Star) {
             // do something here, like give the player points
             soundManager.play(prizeSound);
+        }
+        else if(powerUp instanceof PowerUp.Mushroom){
+        	// play a different sound for eating a mushroom
+        	soundManager.play(mushrmSound);
         }
         else if (powerUp instanceof PowerUp.Music) {
             // change the music
