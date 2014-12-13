@@ -20,9 +20,12 @@ import com.brackeen.javagamebook.tilegame.sprites.*;
 public class GameManager extends GameCore {
 
     public static void main(String[] args) {
+    	arg_arr = args;
         new GameManager().run();
     }
 
+    private static String[] arg_arr; // first input argument
+    
     // uncompressed, 44100Hz, 16-bit, mono, signed, little-endian
     private static final AudioFormat PLAYBACK_FORMAT =
         new AudioFormat(44100, 16, 1, true, false);
@@ -72,9 +75,14 @@ public class GameManager extends GameCore {
         renderer = new TileMapRenderer();
         renderer.setBackground(
             resourceManager.loadImage("background.png"));
-
-        // load first map
-        map = resourceManager.loadNextMap();
+      
+        // load first map      
+        if(arg_arr.length == 0){
+        	map = resourceManager.loadNextMap();
+        }else {
+        	 System.out.println("args: "+arg_arr[0]);
+        	map = resourceManager.loadNextMap(arg_arr[0]);
+        }
 
         // load sounds
         soundManager = new SoundManager(PLAYBACK_FORMAT);

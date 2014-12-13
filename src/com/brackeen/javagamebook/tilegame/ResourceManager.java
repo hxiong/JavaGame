@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.io.*;
 import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 
 import com.brackeen.javagamebook.graphics.*;
@@ -105,10 +106,26 @@ public class ResourceManager {
 
         return map;
     }
+    // overloading loadNextMap
+    public TileMap loadNextMap(String mapName) {
+        TileMap map = null;
+        try {
+        	map = loadMap(
+        			mapName);
+        }
+        catch (IOException ex) {
+        	System.out.println("please load another map");
+        	System.exit(1);
+        }
+        return map;
+    }
 
 
     public TileMap reloadMap() {
         try {
+        	// in case user input is loading map2, then next currentMap is 0; reset to 1
+        	if(currentMap == 0) currentMap++;
+        	
             return loadMap(
                 "maps/map" + currentMap + ".txt");
         }
