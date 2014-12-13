@@ -16,6 +16,7 @@ import com.brackeen.javagamebook.tilegame.sprites.Bullet;
 public class TileMap {
 
     private Image[][] tiles;
+    private int[][] tileAttri;
     private LinkedList sprites;
     private Sprite player;
     private LinkedList<Bullet> bullets;
@@ -26,6 +27,7 @@ public class TileMap {
     */
     public TileMap(int width, int height) {
         tiles = new Image[width][height];
+        tileAttri = new int[width][height];
         sprites = new LinkedList();
         bullets = new LinkedList();
     }
@@ -70,7 +72,22 @@ public class TileMap {
     public void setTile(int x, int y, Image tile) {
         tiles[x][y] = tile;
     }
+    
+    /**
+     * Set tile Attribute, there are three kind of tiles, exploding, gas and normal,
+     * flag=0->normal; flag=1->exploding; flag=2->gas
+     */
+    public void setTileAttribute(int x, int y, int flag)
+    {
+    	tileAttri[x][y]=flag;
+    }
 
+    public int getTileAttribute(int x,int y)
+    {
+    	if(x<0)x=0;
+    	if(y<0)y=0;
+    	return tileAttri[x][y];
+    }
 
     /**
         Gets the player Sprite.

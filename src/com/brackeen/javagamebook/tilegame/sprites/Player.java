@@ -17,6 +17,10 @@ public class Player extends Creature {
     private float maxHealth = 40;
     private long invincibleTimer = 0;    //1sec invincible time
     private boolean gettingHurt = false;
+    public boolean onGas = false;
+    public long onGasTimer = 0;
+    public boolean onInvincible = false;
+    public long onInvincibleTimer = 0;
     private long motionlessTimer = 0;  
     private int score;
     private int automodeOn;   //asserted when in automode;

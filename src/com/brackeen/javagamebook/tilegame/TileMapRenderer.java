@@ -121,10 +121,10 @@ public class TileMapRenderer {
             for (int x=firstTileX; x <= lastTileX; x++) {
                 Image image = map.getTile(x, y);
                 if (image != null) {
-                    g.drawImage(image,
-                        tilesToPixels(x) + offsetX,
-                        tilesToPixels(y) + offsetY,
-                        null);
+                    	g.drawImage(image,
+                    			tilesToPixels(x) + offsetX,
+                    			tilesToPixels(y) + offsetY,
+                    			null);
                 }
             }
         }
@@ -155,6 +155,7 @@ public class TileMapRenderer {
         //g.drawString("Player Health:  "+((Player) player).getHealth(), 25, 25);
          g.setColor(Color.BLACK);
          g.drawString("Player Health:  "+ player.getHealth(), 25, 25);
+     ////    System.out.println("displaying scores*************");
          g.drawString("Player Score: " + player.getScore(), 480,25);
         
          

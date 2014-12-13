@@ -36,10 +36,13 @@ public class GameManager extends GameCore {
     private MidiPlayer midiPlayer;
     private SoundManager soundManager;
     private ResourceManager resourceManager;
+    
     private Sound prizeSound;
     private Sound boopSound;
     private Sound bulletSound;
     private Sound deadSound;  // char got hit
+    private Sound mushrmSound;
+    
     private InputManager inputManager;
     private TileMapRenderer renderer;
 
@@ -79,6 +82,7 @@ public class GameManager extends GameCore {
         prizeSound = soundManager.getSound("sounds/prize.wav");
         boopSound = soundManager.getSound("sounds/boop2.wav");   
         bulletSound = soundManager.getSound("sounds/bulletWhizz.wav");
+        mushrmSound = soundManager.getSound("sounds/cartoon008.wav");
       
         // start music
         midiPlayer = new MidiPlayer();
@@ -149,7 +153,7 @@ public class GameManager extends GameCore {
             	pshootGotPressed = true;
             }
                      
-            if (clip == 0 && pshoot.isReleased()&&pshootGotPressed==true){
+            if (clip == 0 && pshoot.isReleased()&&pshootGotPressed==true&&player.onGas==false){
             	// add shooting sound when bullet shot
                 soundManager.play(bulletSound);
             	Bullet bullet = new Bullet(player.getX(),player.getY(),0);
@@ -217,6 +221,30 @@ public class GameManager extends GameCore {
                 if (x < 0 || x >= map.getWidth() ||
                     map.getTile(x, y) != null)
                 {
+                	//Check whether the collision block is dangerous
+                	if((x<toTileX)&&map.getTileAttribute(x, y)==1&&(sprite instanceof Player))
+                	{
+                		//if the block is exploding, the char will lose 10 health and the block will be set to normal
+                        Player player = (Player)map.getPlayer();
+                        if(player.getHealth()>10){
+                        	player.setHealth(player.getHealth()-10);
+                        }
+                        else{
+                        	player.updateHealth(0);
+        	            	player.setState(Creature.STATE_DYING);
+                        }
+                		map.setTileAttribute(x, y, 0);
+                	}
+                	else if((x<toTileX)&&map.getTileAttribute(x, y)==2&&(sprite instanceof Player))
+                	{
+                		//if the block is gas, the char will not be able to shoot for 1 sec
+                        Player player = (Player)map.getPlayer();
+                        player.onGas = true;
+                        //map.setTileAttribute(x, y, 0);
+                        System.out.println("gas!");
+
+                	}
+                	
                     // collision found, return the tile
                     pointCache.setLocation(x, y);
                     return pointCache;
@@ -287,12 +315,34 @@ public class GameManager extends GameCore {
         in the current map.
     */
     public void update(long elapsedTime) {
-    	
-    	automaticFiring(pshootGotPressed,elapsedTime);
-    	
-        Creature player = (Creature)map.getPlayer();
-
-
+    	 	
+        Player player = (Player)map.getPlayer();
+        
+        //handle gas block
+        if(player.onGas == false){
+        	automaticFiring(pshootGotPressed,elapsedTime);
+        	player.onGasTimer = 0;
+        }
+        else{
+        	System.out.println("on gas**********");
+        	player.onGasTimer += elapsedTime;
+        	if(player.onGasTimer>1000){
+        		player.onGasTimer = 0;
+        		player.onGas = false;
+        	}
+        }
+        //handle invincible
+        if(player.onInvincible==false)
+        	player.onInvincibleTimer = 0;
+        else{
+        	player.onInvincibleTimer += elapsedTime;
+        	if(player.onInvincibleTimer>1000){
+        		player.onInvincibleTimer = 0;
+        		player.onInvincible =false;
+        	}
+        }
+        
+        
         // player is dead! start map over
         if (player.getState() == Creature.STATE_DEAD) {
             map = resourceManager.reloadMap();
@@ -354,12 +404,12 @@ public class GameManager extends GameCore {
         	
         	Player players = (Player)map.getPlayer();
 			if((isCollision(players,bullet))&&(bullet.getBulletFlag()==1)){
-				if(players.getHealth()-5<=0&&players.isHurt()==false)
+				if(players.getHealth()-5<=0&&players.isHurt()==false&&players.onInvincible==false)
 				{
 					players.updateHealth(0);
             		players.setState(Creature.STATE_DYING);
 				}
-				else if(players.isHurt()==false&&players.getHealth()-5>0){
+				else if(players.onInvincible==false&&players.isHurt()==false&&players.getHealth()-5>0){
 					players.updateHealth(-5);
 					players.getHurt();
 				}
@@ -493,14 +543,21 @@ public class GameManager extends GameCore {
         if (collisionSprite instanceof PowerUp) {
             acquirePowerUp((PowerUp)collisionSprite);
             // update player score by 5 for each mushroom eat
+            //TODO play a sound for each mushroom as well
             player.updateScore(5);
+            soundManager.play(mushrmSound);
             //acquire mushroom, gain health
-            if(player.getHealth()<=40)
+            if(player.getHealth()<=40&&collisionSprite instanceof PowerUp.Mushroom)
             {
             	if(player.getHealth()+5>40)
             		player.setHealth(40);
             	else
             		player.updateHealth(5);
+            }
+            //acquire star, invincible for 1 sec
+            else if(collisionSprite instanceof PowerUp.Star)
+            {
+            	player.onInvincible = true;
             }
         }
         else if (collisionSprite instanceof Creature) {
@@ -521,7 +578,7 @@ public class GameManager extends GameCore {
             }
             else {
             	//// update the player health, if below 0, then die
-            	if(player.isHurt()==false){
+            	if(player.isHurt()==false&&player.onInvincible==false){
 	            		// player dies!
 					player.updateHealth(0);
 	            	player.setState(Creature.STATE_DYING);
@@ -559,35 +616,38 @@ public class GameManager extends GameCore {
     }
     
     public void automaticFiring(boolean theStupidButtonIsPressed,float dt){
-    	if(theStupidButtonIsPressed==false)	return;    // shoot button
+//    	if(onGas == false){
+
+    		if(theStupidButtonIsPressed==false)	return;    // shoot button
     	
-    	if(autoFireCD < 1000)
-    	{
-    		autoFireCD += dt;
-    		return;
-    	}
-    	//after pressing the pshoot button for 1 sec, maybe 200,player will fire automatically.
-    	if(pshootPressTimer<200)	
-    	{
-    		pshootPressTimer += dt;
-    		return;
-    	}
-    	//limited 10 rounds per clip
-        Player player = (Player)map.getPlayer();
-    	if(clip<10)
-    	{
-    		Bullet bullet = new Bullet(player.getX(),player.getY(),0);
-        	bullet.setDirection(playerDirectionFlag);
-        	map.addBullet(bullet);
-        	pshootPressTimer = 0;
-        	clip++;
-        //	soundManager.play(bulletSound);
-        }
-    	if(clip==10){
-    		//fired 10 bullets, cool down for 1 sec
-    		autoFireCD = 0;
-    		clip = 0;
-    	}    	
+	    	if(autoFireCD < 1000)
+	    	{
+	    		autoFireCD += dt;
+	    		return;
+	    	}
+	    	//after pressing the pshoot button for 1 sec, maybe 200,player will fire automatically.
+	    	if(pshootPressTimer<200)	
+	    	{
+	    		pshootPressTimer += dt;
+	    		return;
+	    	}
+	    	//limited 10 rounds per clip
+	        Player player = (Player)map.getPlayer();
+	        player.onGasTimer = 0;
+	    	if(clip<10)
+	    	{
+	    		Bullet bullet = new Bullet(player.getX(),player.getY(),0);
+	        	bullet.setDirection(playerDirectionFlag);
+	        	map.addBullet(bullet);
+	        	pshootPressTimer = 0;
+	        	clip++;
+	        //	soundManager.play(bulletSound);
+	        }
+	    	if(clip==10){
+	    		//fired 10 bullets, cool down for 1 sec
+	    		autoFireCD = 0;
+	    		clip = 0;
+	    	}  	
     }
 
 }

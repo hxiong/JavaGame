@@ -29,14 +29,22 @@ public abstract class PowerUp extends Sprite {
 
 
     /**
-        A Star PowerUp. Gives the player points.
+        A Star PowerUp. Gives the player invincible.
     */
     public static class Star extends PowerUp {
         public Star(Animation anim) {
             super(anim);
         }
     }
-
+    
+    /**
+     *  A mushroom PowerUp,Gives the player points
+     */
+    public static class Mushroom extends PowerUp{
+    	public Mushroom(Animation anim){
+    		super(anim);
+    	}
+    }
 
     /**
         A Music PowerUp. Changes the game music.

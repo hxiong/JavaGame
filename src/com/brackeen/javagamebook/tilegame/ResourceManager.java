@@ -25,6 +25,7 @@ public class ResourceManager {
     private Sprite playerSprite;
     private Sprite musicSprite;
     private Sprite coinSprite;
+    private Sprite mushSprite;
     private Sprite goalSprite;
     private Sprite grubSprite;
     private Sprite flySprite;
@@ -155,11 +156,22 @@ public class ResourceManager {
                 int tile = ch - 'A';
                 if (tile >= 0 && tile < tiles.size()) {
                     newMap.setTile(x, y, (Image)tiles.get(tile));
+                    //if the char is P,means it is Exploding block
+                    //if the char is Q, means it is Gas block
+                    if(ch == 'J')
+                    	newMap.setTileAttribute(x, y, 1);
+                    else if(ch == 'K')
+                    	newMap.setTileAttribute(x, y, 2);
+                    else
+                    	newMap.setTileAttribute(x, y, 0);
                 }
 
                 // check if the char represents a sprite
                 else if (ch == 'o') {
                     addSprite(newMap, coinSprite, x, y);
+                }
+                else if(ch == 'm') {
+                	addSprite(newMap,mushSprite,x,y);
                 }
                 else if (ch == '!') {
                     addSprite(newMap, musicSprite, x, y);
@@ -228,6 +240,7 @@ public class ResourceManager {
             }
             tiles.add(loadImage(name));
             ch++;
+            System.out.println("ch = "+ch);            
         }
     }
 
@@ -334,6 +347,14 @@ public class ResourceManager {
         anim.addFrame(loadImage("star4.png"), 100);
         coinSprite = new PowerUp.Star(anim);
 
+        //create "mushroom" sprite
+        anim = new Animation();
+        anim.addFrame(loadImage("mush1.png"), 100);
+        anim.addFrame(loadImage("mush2.png"), 100);
+        anim.addFrame(loadImage("mush3.png"), 100);
+        anim.addFrame(loadImage("mush4.png"), 100);
+        mushSprite = new PowerUp.Mushroom(anim);
+        
         // create "music" sprite
         anim = new Animation();
         anim.addFrame(loadImage("music1.png"), 150);
